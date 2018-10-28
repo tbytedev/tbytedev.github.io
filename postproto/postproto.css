@@ -1,0 +1,58 @@
+body
+{
+	background-color: #232;
+	color: #ACA;
+	font-family: sans-serif;
+}
+
+button
+{
+	border: none;
+	color: #ACA;
+	font-size: 16px;
+	padding: 5px;
+	text-align: center;
+	width: 200px;
+}
+
+button.yes
+{
+	background-color: #454;
+}
+
+button.yes:hover
+{
+	background-color: #464;
+}
+
+button.no
+{
+	background-color: #844;
+}
+
+button.no:hover
+{
+	background-color: #F44;
+}
+
+div.eulaw
+{
+	background-color: #343;
+	bottom: 0;
+	box-shadow: inset 0px 0px 2px 3px #454;
+	box-sizing: border-box;
+	left: 50%;
+	height: 0;
+	position: fixed;
+	transform: translate(-50%);
+	transition-property: height;
+	transition-duration: 1s;
+	transition-timing-function: ease;
+	width: 90%;
+}
+
+div.eulaw_content
+{
+	padding: 10px;
+	overflow: hidden;
+}

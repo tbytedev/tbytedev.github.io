@@ -3,10 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <title>postproto</title>
+<script src="postproto.js"></script>
+<link rel="stylesheet" href="postproto.css">
 </head>
 
-<body>
+<body onload="ShowEULaw()">
 postproto
+<div id="eulaw" class="eulaw" onclick="HideEULaw()">
+<div class="eulaw_content">
+<table><tr>
+<td>
+<span style="font-size: 120%">Do you allow this web page to use local storage to store your own data on your own device?</span><br><br>
+This page is served by a static site host. It does not send any data to any server over the network, and it operates purely on this local device.
+Answering "No" means that this question will be asked over and over again, as there is nowhere to store your choice of "No".
+</td>
+<td>
+<button class="yes">Yes<br>Use local storage</button>
+</td>
+<td>
+<button class="no">No<br>Don't use local storage</button>
+</td>
+</tr></table>
+</div>
+</div>
 </body>
 
 </html>
