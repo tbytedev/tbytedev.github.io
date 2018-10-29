@@ -36,6 +36,7 @@ function OnAllowLocalStorage()
 {
 	localStorage.setItem("LocalStorageEnabled", "true");
 	HideEULaw();
+	g_AllowLocalStorage = true;
 }
 
 function Init()
