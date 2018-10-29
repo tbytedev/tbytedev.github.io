@@ -42,7 +42,9 @@ function Init()
 {
 	if (true === IsLocalStorageAvailable())
 	{
-		if (localStorage.getItem("LocalStorageEnabled") !== "true")
+		if (localStorage.getItem("LocalStorageEnabled") === "true")
+			g_AllowLocalStorage = true;
+		else
 			ShowEULaw();
 	}
 }
