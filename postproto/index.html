@@ -7,21 +7,22 @@
 <link rel="stylesheet" href="postproto.css">
 </head>
 
-<body onload="ShowEULaw()">
+<body onload="Init()">
 postproto
-<div id="eulaw" class="eulaw" onclick="HideEULaw()">
+<div id="eulaw" class="eulaw"">
 <div class="eulaw_content">
 <table><tr>
 <td>
 <span style="font-size: 120%">Do you allow this web page to use local storage to store your own data on your own device?</span><br><br>
-This page is served by a static site host. It does not send any data to any server over the network, and it operates purely on this local device.
-Answering "No" means that this question will be asked over and over again, as there is nowhere to store your choice of "No".
+This page is served by a static site host. It does not send any data to any server over the network,
+and it operates purely on this local device. Answering "No" means that this question will be asked over and over again,
+as there is nowhere to store your choice of "No".
 </td>
 <td>
-<button class="yes">Yes<br>Use local storage</button>
+<button class="yes" onclick="OnAllowLocalStorage()">Yes<br>Use local storage</button>
 </td>
 <td>
-<button class="no">No<br>Don't use local storage</button>
+<button class="no" onclick="HideEULaw()">No<br>Don't use local storage</button>
 </td>
 </tr></table>
 </div>

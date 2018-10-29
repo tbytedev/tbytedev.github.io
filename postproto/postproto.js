@@ -1,11 +1,48 @@
+var g_AllowLocalStorage = false;
+
+function IsLocalStorageAvailable()
+{
+	if (typeof localStorage !== "undefined")
+	{
+		try
+		{
+			localStorage.setItem("LocalStorageTest", "true");
+			if (localStorage.getItem("LocalStorageTest") === "true")
+			{
+				localStorage.removeItem("LocalStorageTest");
+				return true;
+			}
+		}
+		catch(e)
+		{
+		}
+	}
+	return false;
+}
+
 function ShowEULaw()
 {
-	div = document.getElementById("eulaw");
-	div.style.height = String(div.scrollHeight) + "px";
+	var eulaw_div = document.getElementById("eulaw");
+	eulaw_div.style.height = String(eulaw_div.scrollHeight) + "px";
 }
 
 function HideEULaw()
 {
-	div = document.getElementById("eulaw");
-	div.style.height = "0px";
+	var eulaw_div = document.getElementById("eulaw");
+	eulaw_div.style.height = "0px";
+}
+
+function OnAllowLocalStorage()
+{
+	localStorage.setItem("LocalStorageEnabled", "true");
+	HideEULaw();
+}
+
+function Init()
+{
+	if (true === IsLocalStorageAvailable())
+	{
+		if (localStorage.getItem("LocalStorageEnabled") !== "true")
+			ShowEULaw();
+	}
 }
