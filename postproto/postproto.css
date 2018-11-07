@@ -56,3 +56,28 @@ div.eulaw_content
 	padding: 10px;
 	overflow: hidden;
 }
+
+img.texture
+{
+	cursor: pointer;
+	display: block;
+	height: 100%;
+	margin: auto;
+	width: 100%;
+}
+
+input.texture_load
+{
+	display: none;
+}
+
+td.texture
+{
+	padding: 4px;
+	width: 10vw;
+}
+
+tr.textures
+{
+	height: calc(10vw + 4px);
+}

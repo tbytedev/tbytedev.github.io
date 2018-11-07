@@ -1,32 +1,70 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta charset="UTF-8">
-<title>postproto</title>
-<script src="postproto.js"></script>
-<link rel="stylesheet" href="postproto.css">
+	<meta charset="UTF-8">
+	<title>postproto</title>
+	<script src="postproto.js"></script>
+	<link rel="stylesheet" href="postproto.css">
 </head>
 
 <body onload="OnLoad()">
-postproto
-<div id="eulaw" class="eulaw"">
-<div class="eulaw_content">
-<table><tr>
-<td>
-<span style="font-size: 120%">Do you allow this web page to use local storage to store your own data on your own device?</span><br><br>
-This page is served by a static site host. It does not send any data to any server over the network,
-and it operates purely on this local device. Answering "No" means that this question will be asked over and over again,
-because choice of "No" will not be stored and will be forgotten.
-</td>
-<td>
-<button class="yes" onclick="OnAllowLocalStorage()">Yes<br>Use local storage</button>
-</td>
-<td>
-<button class="no" onclick="OnRefuseLocalStorage()">No<br>Don't use local storage</button>
-</td>
-</tr></table>
-</div>
-</div>
+	<table>
+		<tr class="textures">
+			<td class="texture">
+				<label for="texture0_load">
+					<img alt="Texture #0"  class="texture" id="texture0" src="default.png">
+					<input accept="image/*" class="texture_load" id="texture0_load" onchange="OnChangeTexture(event, 'texture0')" type="file">
+				</label>
+			</td>
+			<td class="texture">
+				<label for="texture1_load">
+					<img alt="Texture #1"  class="texture" id="texture1" src="default.png">
+					<input accept="image/*" class="texture_load" id="texture1_load" onchange="OnChangeTexture(event, 'texture1')" type="file">
+				</label>
+			</td>
+			<td class="texture">
+				<label for="texture2_load">
+					<img alt="Texture #2"  class="texture" id="texture2" src="default.png">
+					<input accept="image/*" class="texture_load" id="texture2_load" onchange="OnChangeTexture(event, 'texture2')" type="file">
+				</label>
+			</td>
+			<td class="texture">
+				<label for="texture3_load">
+					<img alt="Texture #3"  class="texture" id="texture3" src="default.png">
+					<input accept="image/*" class="texture_load" id="texture3_load" onchange="OnChangeTexture(event, 'texture3')" type="file">
+				</label>
+			</td>
+		</tr>
+		<tr>
+			<td>Texture #0</td>
+			<td>Texture #1</td>
+			<td>Texture #2</td>
+			<td>Texture #3</td>
+		</tr>
+	</table>
+	<div id="eulaw" class="eulaw"">
+		<div class="eulaw_content">
+			<table>
+				<tr>
+					<td>
+						<span style="font-size: 120%">
+							Do you allow this web page to use local storage to store your own data on your own device?
+						</span><br><br>
+						This page is served by a static site host. It does not send any data to any server over the network,
+						and it operates purely on this local device. Answering "No" means that this question will be asked over and over again,
+						because choice of "No" will not be stored and will be forgotten.
+					</td>
+					<td>
+						<button class="yes" onclick="OnAllowLocalStorage()">Yes<br>Use local storage</button>
+					</td>
+					<td>
+						<button class="no" onclick="OnRefuseLocalStorage()">No<br>Don't use local storage</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
 </body>
 
 </html>

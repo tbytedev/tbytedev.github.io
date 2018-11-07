@@ -90,3 +90,34 @@ function OnLoad()
 			ShowEULaw();
 	}
 }
+
+function OnChangeTexture(event, id)
+{
+	var file_reader = new FileReader;
+
+	file_reader.onload = function()
+	{
+		var temp_imgage = new Image;
+	
+		temp_imgage.onload = function()
+		{
+			var image = document.getElementById(id);
+			if (temp_imgage.width >temp_imgage.height)
+			{
+				image.style.width = "100%";
+				image.style.height = String(100 * temp_imgage.height / temp_imgage.width) + "%";
+			}
+			else
+			{
+				image.style.height = "100%";
+				image.style.width = String(100 * temp_imgage.width / temp_imgage.height) + "%";
+			}
+			image.src = file_reader.result;
+		};
+	
+		temp_imgage.src = file_reader.result;
+	};
+	
+	file_reader.readAsDataURL(event.target.files[0]);
+
+}
