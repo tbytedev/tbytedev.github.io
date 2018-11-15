@@ -3,6 +3,7 @@ body
 	background-color: #232;
 	color: #ACA;
 	font-family: sans-serif;
+	height: 97%;
 }
 
 button
@@ -57,6 +58,22 @@ div.eulaw_content
 	overflow: hidden;
 }
 
+div.left_column
+{
+	box-sizing: border-box;
+	float: left;
+	height: 100%;
+	width: 50%;
+}
+
+div.right_column
+{
+	box-sizing: border-box;
+	float: right;
+	height: 100%;
+	width: 50%;
+}
+
 img.texture
 {
 	cursor: pointer;
@@ -66,18 +83,26 @@ img.texture
 	width: 100%;
 }
 
+html
+{
+	height: 100%;
+}
+
 input.texture_load
 {
 	display: none;
 }
 
-td.texture
+textarea
 {
-	padding: 4px;
-	width: 10vw;
+	box-sizing: border-box;
+	height: 100%;
+	width: 100%;
 }
 
-tr.textures
+td.texture
 {
-	height: calc(10vw + 4px);
+	height: 10vw;
+	padding: 4px;
+	width: 10vw;
 }

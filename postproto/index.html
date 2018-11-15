@@ -9,40 +9,45 @@
 </head>
 
 <body onload="OnLoad()">
-	<table>
-		<tr class="textures">
-			<td class="texture">
-				<label for="texture0_load">
-					<img alt="Texture #0"  class="texture" id="texture0" src="default.png">
-					<input accept="image/*" class="texture_load" id="texture0_load" onchange="OnChangeTexture(event, 'texture0')" type="file">
-				</label>
-			</td>
-			<td class="texture">
-				<label for="texture1_load">
-					<img alt="Texture #1"  class="texture" id="texture1" src="default.png">
-					<input accept="image/*" class="texture_load" id="texture1_load" onchange="OnChangeTexture(event, 'texture1')" type="file">
-				</label>
-			</td>
-			<td class="texture">
-				<label for="texture2_load">
-					<img alt="Texture #2"  class="texture" id="texture2" src="default.png">
-					<input accept="image/*" class="texture_load" id="texture2_load" onchange="OnChangeTexture(event, 'texture2')" type="file">
-				</label>
-			</td>
-			<td class="texture">
-				<label for="texture3_load">
-					<img alt="Texture #3"  class="texture" id="texture3" src="default.png">
-					<input accept="image/*" class="texture_load" id="texture3_load" onchange="OnChangeTexture(event, 'texture3')" type="file">
-				</label>
-			</td>
-		</tr>
-		<tr>
-			<td>Texture #0</td>
-			<td>Texture #1</td>
-			<td>Texture #2</td>
-			<td>Texture #3</td>
-		</tr>
-	</table>
+	<div class="left_column">
+		<table>
+			<tr>
+				<td class="texture">
+					<label for="texture0_load">
+						<img alt="Texture #0"  class="texture" id="texture0" src="default.png">
+						<input accept="image/*" class="texture_load" id="texture0_load" onchange="OnChangeTexture(event, 'texture0')" type="file">
+					</label>
+				</td>
+				<td class="texture">
+					<label for="texture1_load">
+						<img alt="Texture #1"  class="texture" id="texture1" src="default.png">
+						<input accept="image/*" class="texture_load" id="texture1_load" onchange="OnChangeTexture(event, 'texture1')" type="file">
+					</label>
+				</td>
+				<td class="texture">
+					<label for="texture2_load">
+						<img alt="Texture #2"  class="texture" id="texture2" src="default.png">
+						<input accept="image/*" class="texture_load" id="texture2_load" onchange="OnChangeTexture(event, 'texture2')" type="file">
+					</label>
+				</td>
+				<td class="texture">
+					<label for="texture3_load">
+						<img alt="Texture #3"  class="texture" id="texture3" src="default.png">
+						<input accept="image/*" class="texture_load" id="texture3_load" onchange="OnChangeTexture(event, 'texture3')" type="file">
+					</label>
+				</td>
+			</tr>
+			<tr>
+				<td>Texture #0</td>
+				<td>Texture #1</td>
+				<td>Texture #2</td>
+				<td>Texture #3</td>
+			</tr>
+		</table>
+	</div>
+	<div class="right_column">
+		<textarea>Hello</textarea>
+	</div>
 	<div id="eulaw" class="eulaw"">
 		<div class="eulaw_content">
 			<table>
