@@ -3,7 +3,9 @@ body
 	background-color: #232;
 	color: #ACA;
 	font-family: sans-serif;
-	height: 97%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
 }
 
 button
@@ -54,8 +56,8 @@ div.eulaw
 
 div.eulaw_content
 {
-	padding: 10px;
 	overflow: hidden;
+	padding: 10px;
 }
 
 div.left_column
@@ -71,7 +73,19 @@ div.right_column
 	box-sizing: border-box;
 	float: right;
 	height: 100%;
+	padding: 4px;
 	width: 50%;
+}
+
+div.source
+{
+	background-color: #343;
+	box-sizing: border-box;
+	font-family: monospace;
+	height: 100%;
+	padding: 4px;
+	overflow: auto;
+	width: 100%;
 }
 
 img.texture
@@ -86,18 +100,12 @@ img.texture
 html
 {
 	height: 100%;
+	overflow: hidden;
 }
 
 input.texture_load
 {
 	display: none;
-}
-
-textarea
-{
-	box-sizing: border-box;
-	height: 100%;
-	width: 100%;
 }
 
 td.texture
