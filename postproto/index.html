@@ -10,11 +10,19 @@
 
 <body onload="OnLoad()">
 	<div class="left_column">
+		<div class="canvas" id="draw_area">
+			<canvas id="render_canvas"></canvas>
+		</div>
+		<div class="canvas">
+			<canvas></canvas>
+		</div>
+	</div>
+	<div class="right_column">
 		<table>
 			<tr>
 				<td class="texture">
 					<label for="texture0_load">
-						<img alt="Texture #0"  class="texture" id="texture0" src="default.png">
+						<img alt="Texture #0"  class="texture" id="texture0" onload="OnTexture0Load(event)" src="default.png">
 						<input accept="image/*" class="texture_load" id="texture0_load" onchange="OnChangeTexture(event, 'texture0')" type="file">
 					</label>
 				</td>
@@ -44,8 +52,6 @@
 				<td>Texture #3</td>
 			</tr>
 		</table>
-	</div>
-	<div class="right_column">
 		<div class="source" contenteditable="true">Hello</div>
 	</div>
 	<div id="eulaw" class="eulaw"">

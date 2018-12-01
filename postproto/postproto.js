@@ -52,6 +52,7 @@ class ProtoStorage
 var g_AllowLocalStorage = false;
 var g_LocalStorage = new ProtoStorage(localStorage);
 var g_SessionStorage = new ProtoStorage(sessionStorage);
+var g_GLContext = null;
 
 
 function ShowEULaw()
@@ -88,6 +89,31 @@ function OnLoad()
 			g_AllowLocalStorage = true;
 		else if ( "true" !== g_SessionStorage.GetItem("LocalStorageAnswered"))
 			ShowEULaw();
+	}
+
+	var render_canvas = document.getElementById("render_canvas");
+	g_GLContext = render_canvas.getContext("webgl");
+	if (null === g_GLContext)
+		return;
+
+	g_GLContext.clearColor(0.0, 0.0, 0.0, 1.0);
+	g_GLContext.clear(g_GLContext.COLOR_BUFFER_BIT);
+}
+
+function OnTexture0Load(event)
+{
+	var draw_area = document.getElementById("draw_area");
+	var render_canvas = document.getElementById("render_canvas");
+	var tex = event.currentTarget;
+	if (draw_area.clientWidth * tex.naturalHeight > draw_area.clientHeight * tex.naturalWidth)
+	{
+		render_canvas.style.height = "100%";
+		render_canvas.style.width = String(tex.naturalWidth * draw_area.clientHeight / tex.naturalHeight) + "px";
+	}
+	else
+	{
+		render_canvas.style.height = String(tex.naturalHeight * draw_area.clientWidth / tex.naturalWidth) + "%";
+		render_canvas.style.width = "100%";
 	}
 }
 

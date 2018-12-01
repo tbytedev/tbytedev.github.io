@@ -65,12 +65,22 @@ div.left_column
 	box-sizing: border-box;
 	float: left;
 	height: 100%;
+	padding: 4px;
 	width: 50%;
+}
+
+div.canvas
+{
+	box-sizing: border-box;
+	height: 50%;
+	width: 100%;
 }
 
 div.right_column
 {
 	box-sizing: border-box;
+	display: flex;
+	flex-flow: column;
 	float: right;
 	height: 100%;
 	padding: 4px;
