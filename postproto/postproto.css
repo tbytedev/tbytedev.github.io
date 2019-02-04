@@ -38,6 +38,12 @@ button.no:hover
 	background-color: #F44;
 }
 
+canvas
+{
+	height: 100%;
+	width: 100%;
+}
+
 div.eulaw
 {
 	background-color: #343;
