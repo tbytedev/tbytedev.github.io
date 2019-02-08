@@ -1,6 +1,7 @@
 "use strict";
 
 var g_AllowLocalStorage = false;
+var g_RenderCanvas = null;
 var g_GL = null;
 var g_FrameBufferTexture = null;
 var g_FrameBuffer = null;
@@ -26,7 +27,7 @@ void main()
 {
 	ivec2 itexture_size = textureSize(u_Sampler, 0);
 	ivec2 itexcoord = ivec2(gl_FragCoord.xy);
-	if (itexcoord.x > itexture_size.x || itexcoord.y > itexture_size.y)
+	if (itexcoord.x >= itexture_size.x || itexcoord.y >= itexture_size.y)
 		discard;
 	g_Output = texelFetch(u_Sampler, itexcoord, 0);
 }
@@ -140,8 +141,8 @@ function AttachShader(type, source)
 
 function OnDOMContentLoad()
 {
-	var render_canvas = document.getElementById("render_canvas");
-	g_GL = render_canvas.getContext("webgl2");
+	g_RenderCanvas = document.getElementById("render_canvas");
+	g_GL = g_RenderCanvas.getContext("webgl2");
 	if (null === g_GL)
 		return;
 
@@ -193,6 +194,11 @@ function OnTexture0Load(event)
 	if (null === g_FrameBufferTexture)
 		return;
 	
+	if (g_RenderCanvas.width != g_RenderCanvas.clientWidth)
+		g_RenderCanvas.width = g_RenderCanvas.clientWidth;
+	if (g_RenderCanvas.height != g_RenderCanvas.clientHeight)
+		g_RenderCanvas.height = g_RenderCanvas.clientHeight;
+
 	g_GL.bindTexture(g_GL.TEXTURE_2D, g_FrameBufferTexture);
 
 	var tex = event.currentTarget;
