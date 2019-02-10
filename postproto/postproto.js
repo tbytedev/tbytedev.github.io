@@ -6,6 +6,8 @@ var g_GL = null;
 var g_FrameBufferTexture = null;
 var g_FrameBuffer = null;
 var g_VertexBuffer = null;
+var g_UniformBuffer = null;
+var g_UniformBufferLocation = null;
 var g_Program = null;
 var g_Texture = null;
 var g_TextureLocation = null;
@@ -19,15 +21,19 @@ void main()
 `
 
 const g_FragmentShaderSource = `#version 300 es
-precision highp int;
-precision mediump float;
-out vec4 g_Output;
+out mediump vec4 g_Output;
+uniform u_Buffer
+{
+	highp float TexcoordFactor;
+};
 uniform sampler2D u_Sampler;
 void main()
 {
-	ivec2 itexture_size = textureSize(u_Sampler, 0);
-	ivec2 itexcoord = ivec2(gl_FragCoord.xy);
-	if (itexcoord.x >= itexture_size.x || itexcoord.y >= itexture_size.y)
+	highp ivec2 itexture_size = textureSize(u_Sampler, 0);
+	highp ivec2 itexcoord;
+	itexcoord.x = int(TexcoordFactor * gl_FragCoord.x);
+	itexcoord.y = itexture_size.y - 1 - int(TexcoordFactor * gl_FragCoord.y);
+	if (itexcoord.x >= itexture_size.x || itexcoord.y < 0)
 		discard;
 	g_Output = texelFetch(u_Sampler, itexcoord, 0);
 }
@@ -36,8 +42,8 @@ void main()
 const g_VertexData = new Float32Array
 ([
 	-1.0, -1.0,
-	1.0, -1.0,
-	-1.0, 1.0
+	3.0, -1.0,
+	-1.0, 3.0
 ]);
 
 if ("loading" === document.readyState)
@@ -162,18 +168,21 @@ function OnDOMContentLoad()
 		console.log("Error linking shader program:");
 		console.log(g_GL.getProgramInfoLog(g_Program));
 	}
+	g_GL.useProgram(g_Program);
 
-	var position_location = g_GL.getAttribLocation(g_Program, "i_VertexPosition");
-
-	var g_VertexBuffer = g_GL.createBuffer();
+	g_VertexBuffer = g_GL.createBuffer();
 	g_GL.bindBuffer(g_GL.ARRAY_BUFFER, g_VertexBuffer);
 	g_GL.bufferData(g_GL.ARRAY_BUFFER, g_VertexData, g_GL.STATIC_DRAW);
 
+	g_UniformBuffer = g_GL.createBuffer();
+	g_GL.uniformBlockBinding(g_Program, g_UniformBufferLocation, 0);
+
 	g_Texture = g_GL.createTexture();
 
-	g_TextureLocation = g_GL.getUniformLocation(g_Program, "uSampler");
+	g_TextureLocation = g_GL.getUniformLocation(g_Program, "u_Sampler");
+	g_UniformBufferLocation = g_GL.getUniformBlockIndex(g_Program, "u_Sampler");
 
-	g_GL.useProgram(g_Program);
+	var position_location = g_GL.getAttribLocation(g_Program, "i_VertexPosition");
 	g_GL.enableVertexAttribArray(position_location);
 	g_GL.vertexAttribPointer(position_location, 2, g_GL.FLOAT, false, 0, 0);
 }
@@ -199,9 +208,18 @@ function OnTexture0Load(event)
 	if (g_RenderCanvas.height != g_RenderCanvas.clientHeight)
 		g_RenderCanvas.height = g_RenderCanvas.clientHeight;
 
-	g_GL.bindTexture(g_GL.TEXTURE_2D, g_FrameBufferTexture);
+	g_GL.viewport(0, 0, g_RenderCanvas.clientWidth, g_RenderCanvas.clientHeight);
 
 	var tex = event.currentTarget;
+
+	var texcoord_factor = Math.max(tex.naturalWidth / g_RenderCanvas.clientWidth, tex.naturalHeight / g_RenderCanvas.clientHeight);
+	const uniform_data = new Float32Array([texcoord_factor, 0, 0, 0]);
+	g_GL.bindBuffer(g_GL.UNIFORM_BUFFER, g_UniformBuffer);
+	g_GL.bufferData(g_GL.UNIFORM_BUFFER, uniform_data, g_GL.STATIC_DRAW);
+	g_GL.bindBufferBase(g_GL.UNIFORM_BUFFER, 0, g_UniformBuffer);
+
+	g_GL.bindTexture(g_GL.TEXTURE_2D, g_FrameBufferTexture);
+
 	g_GL.texImage2D(g_GL.TEXTURE_2D, 0, g_GL.RGBA, tex.naturalWidth, tex.naturalHeight, 0, g_GL.RGBA, g_GL.UNSIGNED_BYTE, null);
 
 	g_GL.bindFramebuffer(g_GL.FRAMEBUFFER, g_FrameBuffer);
