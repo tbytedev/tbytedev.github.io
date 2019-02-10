@@ -11,6 +11,7 @@ var g_UniformBufferLocation = null;
 var g_Program = null;
 var g_Texture = null;
 var g_TextureLocation = null;
+var g_Image = null;
 
 const g_VertexShaderSource = `#version 300 es
 in vec2 i_VertexPosition;
@@ -182,9 +183,13 @@ function OnDOMContentLoad()
 	g_TextureLocation = g_GL.getUniformLocation(g_Program, "u_Sampler");
 	g_UniformBufferLocation = g_GL.getUniformBlockIndex(g_Program, "u_Sampler");
 
+	g_GL.bindBuffer(g_GL.ARRAY_BUFFER, g_VertexBuffer);
 	var position_location = g_GL.getAttribLocation(g_Program, "i_VertexPosition");
 	g_GL.enableVertexAttribArray(position_location);
 	g_GL.vertexAttribPointer(position_location, 2, g_GL.FLOAT, false, 0, 0);
+
+	SetCanvasBuffer();
+	SetUniformData();
 }
 
 function OnLoad()
@@ -198,30 +203,41 @@ function OnLoad()
 	}
 }
 
-function OnTexture0Load(event)
+function OnResize()
 {
-	if (null === g_FrameBufferTexture)
-		return;
-	
+	SetCanvasBuffer();
+	SetUniformData();
+	Render();
+}
+
+function SetCanvasBuffer()
+{
 	if (g_RenderCanvas.width != g_RenderCanvas.clientWidth)
 		g_RenderCanvas.width = g_RenderCanvas.clientWidth;
 	if (g_RenderCanvas.height != g_RenderCanvas.clientHeight)
 		g_RenderCanvas.height = g_RenderCanvas.clientHeight;
 
-	g_GL.viewport(0, 0, g_RenderCanvas.clientWidth, g_RenderCanvas.clientHeight);
+	if (null === g_GL)
+		return;
 
-	var tex = event.currentTarget;
+	g_GL.viewport(0, 0, g_GL.drawingBufferWidth, g_GL.drawingBufferHeight);
+}
 
-	var texcoord_factor = Math.max(tex.naturalWidth / g_RenderCanvas.clientWidth, tex.naturalHeight / g_RenderCanvas.clientHeight);
+function SetUniformData()
+{
+	if (null === g_Image)
+		return;
+
+	var texcoord_factor = Math.max(g_Image.naturalWidth / g_GL.drawingBufferWidth, g_Image.naturalHeight / g_GL.drawingBufferHeight);
 	const uniform_data = new Float32Array([texcoord_factor, 0, 0, 0]);
 	g_GL.bindBuffer(g_GL.UNIFORM_BUFFER, g_UniformBuffer);
 	g_GL.bufferData(g_GL.UNIFORM_BUFFER, uniform_data, g_GL.STATIC_DRAW);
 	g_GL.bindBufferBase(g_GL.UNIFORM_BUFFER, 0, g_UniformBuffer);
+}
 
-	g_GL.bindTexture(g_GL.TEXTURE_2D, g_FrameBufferTexture);
-
-	g_GL.texImage2D(g_GL.TEXTURE_2D, 0, g_GL.RGBA, tex.naturalWidth, tex.naturalHeight, 0, g_GL.RGBA, g_GL.UNSIGNED_BYTE, null);
-
+function Render()
+{
+	// Test only
 	g_GL.bindFramebuffer(g_GL.FRAMEBUFFER, g_FrameBuffer);
 	g_GL.clearColor(0, 0, 1, 1);
 	g_GL.clear(g_GL.COLOR_BUFFER_BIT);
@@ -232,7 +248,7 @@ function OnTexture0Load(event)
 
 	g_GL.activeTexture(g_GL.TEXTURE0);
 	g_GL.bindTexture(g_GL.TEXTURE_2D, g_Texture);
-	g_GL.texImage2D(g_GL.TEXTURE_2D, 0, g_GL.RGBA, tex.naturalWidth, tex.naturalHeight, 0, g_GL.RGBA, g_GL.UNSIGNED_BYTE, tex);
+	g_GL.texImage2D(g_GL.TEXTURE_2D, 0, g_GL.RGBA, g_Image.naturalWidth, g_Image.naturalHeight, 0, g_GL.RGBA, g_GL.UNSIGNED_BYTE, g_Image);
 
 	g_GL.texParameteri(g_GL.TEXTURE_2D, g_GL.TEXTURE_WRAP_S, g_GL.CLAMP_TO_EDGE);
 	g_GL.texParameteri(g_GL.TEXTURE_2D, g_GL.TEXTURE_WRAP_T, g_GL.CLAMP_TO_EDGE);
@@ -240,6 +256,21 @@ function OnTexture0Load(event)
 	g_GL.uniform1i(g_TextureLocation, 0);
 
 	g_GL.drawArrays(g_GL.TRIANGLES, 0, 3);
+}
+
+function OnTexture0Load(event)
+{
+	if (null === g_GL)
+		return;
+
+	g_Image = event.currentTarget;
+
+	g_GL.bindTexture(g_GL.TEXTURE_2D, g_FrameBufferTexture);
+	g_GL.texImage2D(g_GL.TEXTURE_2D, 0, g_GL.RGBA, g_Image.naturalWidth, g_Image.naturalHeight, 0, g_GL.RGBA, g_GL.UNSIGNED_BYTE, null);
+
+	SetCanvasBuffer();
+	SetUniformData();
+	Render();
 }
 
 function OnChangeTexture(event, id)
