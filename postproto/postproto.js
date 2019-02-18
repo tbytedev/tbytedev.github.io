@@ -3,6 +3,9 @@
 var g_AllowLocalStorage = false;
 var g_RenderCanvas = null;
 var g_GL = null;
+var g_RenderCanvasRect = null;
+var g_ZoomCanvas = null;
+var g_ZoomContext = null;
 var g_FrameBufferTexture = null;
 var g_FrameBuffer = null;
 var g_VertexBuffer = null;
@@ -149,9 +152,13 @@ function AttachShader(type, source)
 function OnDOMContentLoad()
 {
 	g_RenderCanvas = document.getElementById("render_canvas");
-	g_GL = g_RenderCanvas.getContext("webgl2");
+	g_RenderCanvas.addEventListener("mousemove", OnMouseMove);
+	g_GL = g_RenderCanvas.getContext("webgl2", {preserveDrawingBuffer: true});
 	if (null === g_GL)
 		return;
+
+	g_ZoomCanvas = document.getElementById("zoom_canvas");
+	g_ZoomContext = g_ZoomCanvas.getContext("2d");
 
 	g_FrameBufferTexture = g_GL.createTexture();
 	g_GL.bindTexture(g_GL.TEXTURE_2D, g_FrameBufferTexture);
@@ -213,9 +220,17 @@ function OnResize()
 function SetCanvasBuffer()
 {
 	if (g_RenderCanvas.width != g_RenderCanvas.clientWidth)
+	{
 		g_RenderCanvas.width = g_RenderCanvas.clientWidth;
+		g_ZoomCanvas.width = g_RenderCanvas.clientWidth;
+	}
 	if (g_RenderCanvas.height != g_RenderCanvas.clientHeight)
+	{
 		g_RenderCanvas.height = g_RenderCanvas.clientHeight;
+		g_ZoomCanvas.height = g_RenderCanvas.clientHeight;
+	}
+
+	g_RenderCanvasRect = g_RenderCanvas.getBoundingClientRect();
 
 	if (null === g_GL)
 		return;
@@ -256,6 +271,18 @@ function Render()
 	g_GL.uniform1i(g_TextureLocation, 0);
 
 	g_GL.drawArrays(g_GL.TRIANGLES, 0, 3);
+}
+
+function OnMouseMove(event)
+{
+	if (null === g_RenderCanvas)
+		return;
+
+	var mouse_x = event.clientX - g_RenderCanvasRect.left;
+	var mouse_y = event.clientY - g_RenderCanvasRect.top;
+
+	g_ZoomContext.imageSmoothingEnabled = false;
+	g_ZoomContext.drawImage(g_RenderCanvas, mouse_x - 16, mouse_y - 16, 32, 32, 0, 0, g_RenderCanvas.width, g_RenderCanvas.height);
 }
 
 function OnTexture0Load(event)
