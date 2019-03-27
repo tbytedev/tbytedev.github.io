@@ -44,14 +44,14 @@ uniform u_Buffer
 {
 	highp float PreviewHorizontalScale;
 	highp float PreviewVerticalScale;
-	highp int   PreviewVerticalOffset;
+	highp float PreviewVerticalOffset;
 };
 uniform sampler2D u_Sampler;
 void main()
 {
 	highp ivec2 itexcoord;
 	itexcoord.x = int(PreviewHorizontalScale * gl_FragCoord.x);
-	itexcoord.y = int(PreviewVerticalScale   * gl_FragCoord.y) + PreviewVerticalOffset;
+	itexcoord.y = int(PreviewVerticalScale   * gl_FragCoord.y + PreviewVerticalOffset);
 	g_Output = texelFetch(u_Sampler, itexcoord, 0);
 }
 `
@@ -292,7 +292,8 @@ function SetCanvasBuffer()
 		g_PreviewViewportHeight = g_DrawAreaHeight;
 		g_PreviewHorizontalScale = g_Image.naturalWidth / g_PreviewViewportWidth;
 	}
-	g_PreviewVerticalOffset = (g_PreviewViewportHeight - g_RenderCanvas.height) * g_PreviewVerticalScale;
+	g_PreviewVerticalOffset = g_Image.naturalHeight - (g_PreviewViewportHeight - g_RenderCanvas.height) * g_PreviewVerticalScale;
+	g_PreviewVerticalScale = -g_PreviewVerticalScale;
 }
 
 function SetPreviewUniformData()
@@ -302,9 +303,9 @@ function SetPreviewUniformData()
 
 	const uniform_data = new ArrayBuffer(16);
 	const data_view = new DataView(uniform_data);
-	data_view.setFloat32(0,  g_PreviewHorizontalScale, true);
-	data_view.setFloat32(4,  g_PreviewVerticalScale,   true);
-	data_view.setInt32  (8,  g_PreviewVerticalOffset,  true);
+	data_view.setFloat32(0, g_PreviewHorizontalScale, true);
+	data_view.setFloat32(4, g_PreviewVerticalScale,   true);
+	data_view.setFloat32(8, g_PreviewVerticalOffset,  true);
 	g_GL.bindBuffer(g_GL.UNIFORM_BUFFER, g_PreviewUniformBuffer);
 	g_GL.bufferData(g_GL.UNIFORM_BUFFER, uniform_data, g_GL.STATIC_DRAW);
 	g_GL.bindBufferBase(g_GL.UNIFORM_BUFFER, 0, g_PreviewUniformBuffer);
