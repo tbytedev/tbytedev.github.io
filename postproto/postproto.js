@@ -60,18 +60,19 @@ const g_ZoomFragmentShaderSource = `#version 300 es
 out mediump vec4 g_Output;
 uniform u_Buffer
 {
-	highp float TexcoordFactor;
-	highp float RendertargetHeight;
-	highp float ViewportHeight;
+	highp float TexX;
+	highp float TexY;
+	highp float DrawAreaWidth;
+	highp float DrawAreaHeight;
 };
 uniform sampler2D u_Sampler;
 void main()
 {
 	highp ivec2 itexture_size = textureSize(u_Sampler, 0);
 	highp ivec2 itexcoord;
-	itexcoord.x = int(TexcoordFactor * gl_FragCoord.x);
-	itexcoord.y = itexture_size.y - 1 - int(TexcoordFactor * (gl_FragCoord.y - RendertargetHeight + ViewportHeight));
-	if (itexcoord.x >= itexture_size.x || itexcoord.y < 0)
+	itexcoord.x = int(TexX + (gl_FragCoord.x - 0.5 * DrawAreaWidth) * 0.125);
+	itexcoord.y = int(TexY - (gl_FragCoord.y - 0.5 * DrawAreaHeight) * 0.125);
+	if (itexcoord.x < 0 || itexture_size.x <= itexcoord.x || itexcoord.y < 0 || itexture_size.y <= itexcoord.y)
 		discard;
 	g_Output = texelFetch(u_Sampler, itexcoord, 0);
 }
@@ -311,17 +312,17 @@ function SetPreviewUniformData()
 	g_GL.bindBufferBase(g_GL.UNIFORM_BUFFER, 0, g_PreviewUniformBuffer);
 }
 
-function SetZoomUniformData(mouse_x, mouse_y)
+function SetZoomUniformData(tex_x, tex_y)
 {
 	if (null === g_Image)
 		return;
 
-	var texcoord_factor = Math.max(g_Image.naturalWidth / g_DrawAreaWidth, g_Image.naturalHeight / g_DrawAreaHeight);
 	const uniform_data = new ArrayBuffer(16);
 	const data_view = new DataView(uniform_data);
-	data_view.setFloat32(0, texcoord_factor, true);
-	data_view.setFloat32(4, g_RenderCanvas.height, true);
-	data_view.setFloat32(8, g_DrawAreaHeight, true);
+	data_view.setFloat32( 0, tex_x, true);
+	data_view.setFloat32( 4, tex_y, true);
+	data_view.setFloat32( 8, g_DrawAreaWidth, true);
+	data_view.setFloat32(12, g_DrawAreaHeight, true);
 	g_GL.bindBuffer(g_GL.UNIFORM_BUFFER, g_ZoomUniformBuffer);
 	g_GL.bufferData(g_GL.UNIFORM_BUFFER, uniform_data, g_GL.STATIC_DRAW);
 	g_GL.bindBufferBase(g_GL.UNIFORM_BUFFER, 0, g_ZoomUniformBuffer);
@@ -377,10 +378,13 @@ function OnMouseMove(event)
 	if (null === g_RenderCanvas)
 		return;
 
-	var mouse_x = event.clientX - g_RenderCanvasRect.left;
-	var mouse_y = event.clientY - g_RenderCanvasRect.top;
+	var mouse_x = event.pageX - g_RenderCanvasRect.left;
+	var mouse_y = event.pageY - g_RenderCanvasRect.top;
 
-	SetZoomUniformData(mouse_x, mouse_y);
+	var tex_x = mouse_x * g_PreviewHorizontalScale;
+	var tex_y = (g_RenderCanvasRect.height - mouse_y) * g_PreviewVerticalScale + g_PreviewVerticalOffset;
+
+	SetZoomUniformData(tex_x, tex_y);
 	RenderZoom();
 }
 
