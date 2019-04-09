@@ -30,6 +30,8 @@ var g_PreviewHorizontalScale = 0;
 var g_PreviewVerticalScale = 0;
 var g_PreviewVerticalOffset = 0;
 
+const g_ZoomScale = 8;
+
 const g_VertexShaderSource = `#version 300 es
 in vec2 i_VertexPosition;
 void main()
@@ -60,21 +62,21 @@ const g_ZoomFragmentShaderSource = `#version 300 es
 out mediump vec4 g_Output;
 uniform u_Buffer
 {
-	highp float TexX;
-	highp float TexY;
-	highp float DrawAreaWidth;
-	highp float DrawAreaHeight;
+	highp float ZoomScale;
+	highp float ZoomHorizontalOffset;
+	highp float ZoomVerticalOffset;
 };
 uniform sampler2D u_Sampler;
 void main()
 {
 	highp ivec2 itexture_size = textureSize(u_Sampler, 0);
 	highp ivec2 itexcoord;
-	itexcoord.x = int(TexX + (gl_FragCoord.x - 0.5 * DrawAreaWidth) * 0.125);
-	itexcoord.y = int(TexY - (gl_FragCoord.y - 0.5 * DrawAreaHeight) * 0.125);
+	itexcoord.x = int( ZoomScale * gl_FragCoord.x + ZoomHorizontalOffset);
+	itexcoord.y = int(-ZoomScale * gl_FragCoord.y + ZoomVerticalOffset);
 	if (itexcoord.x < 0 || itexture_size.x <= itexcoord.x || itexcoord.y < 0 || itexture_size.y <= itexcoord.y)
-		discard;
-	g_Output = texelFetch(u_Sampler, itexcoord, 0);
+		g_Output = vec4(0.13333333, 0.2, 0.13333333, 1.0);
+	else
+		g_Output = texelFetch(u_Sampler, itexcoord, 0);
 }
 `
 
@@ -312,17 +314,20 @@ function SetPreviewUniformData()
 	g_GL.bindBufferBase(g_GL.UNIFORM_BUFFER, 0, g_PreviewUniformBuffer);
 }
 
-function SetZoomUniformData(tex_x, tex_y)
+function SetZoomUniformData(mouse_x, mouse_y)
 {
 	if (null === g_Image)
 		return;
 
+	const zoom_scale = 1 / g_ZoomScale;
+	const zoom_offset_x = -zoom_scale * 0.5 * g_DrawAreaWidth  + mouse_x * g_PreviewHorizontalScale;
+	const zoom_offset_y =  zoom_scale * 0.5 * g_DrawAreaHeight + (g_RenderCanvasRect.height - mouse_y) * g_PreviewVerticalScale + g_PreviewVerticalOffset
+
 	const uniform_data = new ArrayBuffer(16);
 	const data_view = new DataView(uniform_data);
-	data_view.setFloat32( 0, tex_x, true);
-	data_view.setFloat32( 4, tex_y, true);
-	data_view.setFloat32( 8, g_DrawAreaWidth, true);
-	data_view.setFloat32(12, g_DrawAreaHeight, true);
+	data_view.setFloat32(0, zoom_scale, true);
+	data_view.setFloat32(4, zoom_offset_x, true);
+	data_view.setFloat32(8, zoom_offset_y, true);
 	g_GL.bindBuffer(g_GL.UNIFORM_BUFFER, g_ZoomUniformBuffer);
 	g_GL.bufferData(g_GL.UNIFORM_BUFFER, uniform_data, g_GL.STATIC_DRAW);
 	g_GL.bindBufferBase(g_GL.UNIFORM_BUFFER, 0, g_ZoomUniformBuffer);
@@ -336,9 +341,8 @@ function RenderPreview()
 	g_GL.clear(g_GL.COLOR_BUFFER_BIT);
 
 	g_GL.bindFramebuffer(g_GL.FRAMEBUFFER, null);
-	g_GL.clearColor(1, 1, 0, 1);
+	g_GL.clearColor(0.13333333, 0.2, 0.13333333, 1);
 	g_GL.clear(g_GL.COLOR_BUFFER_BIT);
-
 	g_GL.viewport(0, g_RenderCanvas.height - g_PreviewViewportHeight, g_PreviewViewportWidth, g_PreviewViewportHeight);
 
 	g_GL.useProgram(g_PreviewProgram);
@@ -381,10 +385,7 @@ function OnMouseMove(event)
 	var mouse_x = event.pageX - g_RenderCanvasRect.left;
 	var mouse_y = event.pageY - g_RenderCanvasRect.top;
 
-	var tex_x = mouse_x * g_PreviewHorizontalScale;
-	var tex_y = (g_RenderCanvasRect.height - mouse_y) * g_PreviewVerticalScale + g_PreviewVerticalOffset;
-
-	SetZoomUniformData(tex_x, tex_y);
+	SetZoomUniformData(mouse_x, mouse_y);
 	RenderZoom();
 }
 
