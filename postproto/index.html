@@ -47,7 +47,18 @@
 				<td>Texture #3</td>
 			</tr>
 		</table>
-		<div class="source" contenteditable="true">Hello</div>
+		<div id="source" class="source" contenteditable="true">#version 300 es<br>
+out mediump vec4 g_Output;<br>
+uniform sampler2D u_Sampler;<br>
+void main()<br>
+{<br>
+highp ivec2 itexcoord;<br>
+itexcoord.x = int(gl_FragCoord.x);<br>
+itexcoord.y = int(gl_FragCoord.y);<br>
+highp vec4 tex = texelFetch(u_Sampler, itexcoord, 0);<br>
+highp float lum = 0.299 * tex.r + 0.587 * tex.g + 0.114 * tex.b;<br>
+g_Output = vec4(lum, lum, lum, tex.a);<br>
+}</div>
 	</div>
 	<div id="eulaw" class="eulaw"">
 		<div class="eulaw_content">

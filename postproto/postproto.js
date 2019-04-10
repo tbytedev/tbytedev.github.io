@@ -8,7 +8,7 @@ var g_FrameBufferTexture = null;
 var g_FrameBuffer = null;
 var g_VertexBuffer = null;
 
-var g_PreviewTexture = null;
+var g_ImageTexture = null;
 
 var g_PreviewProgram = null;
 var g_PreviewUniformBuffer = null;
@@ -21,6 +21,9 @@ var g_ZoomUniformBufferLocation = null;
 var g_ZoomTextureLocation = null;
 var g_Image = null;
 
+var g_Program = null;
+var g_TextureLocation = null;
+
 var g_DrawAreaWidth = 0;
 var g_DrawAreaHeight = 0;
 var g_Gap = 0;
@@ -29,6 +32,8 @@ var g_PreviewViewportHeight = 0;
 var g_PreviewHorizontalScale = 0;
 var g_PreviewVerticalScale = 0;
 var g_PreviewVerticalOffset = 0;
+
+var g_SourceDiv = null;
 
 const g_ZoomScale = 8;
 
@@ -226,7 +231,6 @@ function OnDOMContentLoad()
 	g_GL.vertexAttribPointer(position_location, 2, g_GL.FLOAT, false, 0, 0);
 
 	g_PreviewTextureLocation = g_GL.getUniformLocation(g_PreviewProgram, "u_Sampler");
-	g_PreviewTexture = g_GL.createTexture();
 
 	g_PreviewUniformBufferLocation = g_GL.getUniformBlockIndex(g_PreviewProgram, "u_Buffer");
 	g_PreviewUniformBuffer = g_GL.createBuffer();
@@ -242,6 +246,11 @@ function OnDOMContentLoad()
 
 	SetCanvasBuffer();
 	SetPreviewUniformData();
+
+	g_SourceDiv = document.getElementById("source");
+	g_Program = CreateProgram(g_VertexShaderSource, g_SourceDiv.innerText);
+
+	g_TextureLocation = g_GL.getUniformLocation(g_Program, "u_Sampler");
 }
 
 function OnLoad()
@@ -335,11 +344,6 @@ function SetZoomUniformData(mouse_x, mouse_y)
 
 function RenderPreview()
 {
-	// Test only
-	g_GL.bindFramebuffer(g_GL.FRAMEBUFFER, g_FrameBuffer);
-	g_GL.clearColor(0, 0, 1, 1);
-	g_GL.clear(g_GL.COLOR_BUFFER_BIT);
-
 	g_GL.bindFramebuffer(g_GL.FRAMEBUFFER, null);
 	g_GL.clearColor(0.13333333, 0.2, 0.13333333, 1);
 	g_GL.clear(g_GL.COLOR_BUFFER_BIT);
@@ -348,8 +352,7 @@ function RenderPreview()
 	g_GL.useProgram(g_PreviewProgram);
 
 	g_GL.activeTexture(g_GL.TEXTURE0);
-	g_GL.bindTexture(g_GL.TEXTURE_2D, g_PreviewTexture);
-	g_GL.texImage2D(g_GL.TEXTURE_2D, 0, g_GL.RGBA, g_Image.naturalWidth, g_Image.naturalHeight, 0, g_GL.RGBA, g_GL.UNSIGNED_BYTE, g_Image);
+	g_GL.bindTexture(g_GL.TEXTURE_2D, g_FrameBufferTexture);
 
 	g_GL.texParameteri(g_GL.TEXTURE_2D, g_GL.TEXTURE_WRAP_S, g_GL.CLAMP_TO_EDGE);
 	g_GL.texParameteri(g_GL.TEXTURE_2D, g_GL.TEXTURE_WRAP_T, g_GL.CLAMP_TO_EDGE);
@@ -361,13 +364,13 @@ function RenderPreview()
 
 function RenderZoom()
 {
+	g_GL.bindFramebuffer(g_GL.FRAMEBUFFER, null);
 	g_GL.viewport(0, 0, g_DrawAreaWidth, g_DrawAreaHeight);
 
 	g_GL.useProgram(g_ZoomProgram);
 
 	g_GL.activeTexture(g_GL.TEXTURE0);
-	g_GL.bindTexture(g_GL.TEXTURE_2D, g_PreviewTexture);
-	g_GL.texImage2D(g_GL.TEXTURE_2D, 0, g_GL.RGBA, g_Image.naturalWidth, g_Image.naturalHeight, 0, g_GL.RGBA, g_GL.UNSIGNED_BYTE, g_Image);
+	g_GL.bindTexture(g_GL.TEXTURE_2D, g_FrameBufferTexture);
 
 	g_GL.texParameteri(g_GL.TEXTURE_2D, g_GL.TEXTURE_WRAP_S, g_GL.CLAMP_TO_EDGE);
 	g_GL.texParameteri(g_GL.TEXTURE_2D, g_GL.TEXTURE_WRAP_T, g_GL.CLAMP_TO_EDGE);
@@ -396,8 +399,26 @@ function OnTexture0Load(event)
 
 	g_Image = event.currentTarget;
 
+	g_GL.bindFramebuffer(g_GL.FRAMEBUFFER, g_FrameBuffer);
+	g_GL.viewport(0, 0, g_Image.naturalWidth, g_Image.naturalHeight);
+
 	g_GL.bindTexture(g_GL.TEXTURE_2D, g_FrameBufferTexture);
 	g_GL.texImage2D(g_GL.TEXTURE_2D, 0, g_GL.RGBA, g_Image.naturalWidth, g_Image.naturalHeight, 0, g_GL.RGBA, g_GL.UNSIGNED_BYTE, null);
+
+	g_GL.useProgram(g_Program);
+
+	g_GL.activeTexture(g_GL.TEXTURE0);
+
+	g_ImageTexture = g_GL.createTexture();
+	g_GL.bindTexture(g_GL.TEXTURE_2D, g_ImageTexture);
+	g_GL.texImage2D(g_GL.TEXTURE_2D, 0, g_GL.RGBA, g_Image.naturalWidth, g_Image.naturalHeight, 0, g_GL.RGBA, g_GL.UNSIGNED_BYTE, g_Image);
+
+	g_GL.texParameteri(g_GL.TEXTURE_2D, g_GL.TEXTURE_WRAP_S, g_GL.CLAMP_TO_EDGE);
+	g_GL.texParameteri(g_GL.TEXTURE_2D, g_GL.TEXTURE_WRAP_T, g_GL.CLAMP_TO_EDGE);
+	g_GL.texParameteri(g_GL.TEXTURE_2D, g_GL.TEXTURE_MIN_FILTER, g_GL.NEAREST);
+	g_GL.uniform1i(g_TextureLocation, 0);
+
+	g_GL.drawArrays(g_GL.TRIANGLES, 0, 3);
 
 	SetCanvasBuffer();
 	SetPreviewUniformData();
